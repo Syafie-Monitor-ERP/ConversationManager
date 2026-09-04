@@ -1,0 +1,142 @@
+<Window x:Class="ConversationManager.TranscriptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ConversationManager"
+        xmlns:vm="clr-namespace:ConversationManager.ViewModels"
+        Title="Conversation"
+        Icon="app.ico"
+        Height="820" Width="900" MinHeight="420" MinWidth="620"
+        Background="{StaticResource Bg}"
+        TextOptions.TextFormattingMode="Ideal"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+
+        <!-- One turn. Tool calls are one line plus the head of what came back; prose is wrapped
+             in full, because recovering context is the whole reason this window exists. -->
+        <DataTemplate DataType="{x:Type vm:TurnViewModel}">
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="76" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,1,10,0">
+                    <TextBlock x:Name="Role" Text="{Binding RoleLabel}"
+                               Style="{StaticResource Label}"
+                               FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding RoleLabel}" />
+                    <TextBlock Text="{Binding TimeText}" Style="{StaticResource Label}"
+                               Opacity="0.65" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock x:Name="Body" TextWrapping="Wrap" FontSize="13"
+                               local:Highlight.Text="{Binding Text}"
+                               local:Highlight.Start="{Binding MatchStart}"
+                               local:Highlight.Length="{Binding MatchLength}"
+                               local:Highlight.Brush="{StaticResource Hit}" />
+
+                    <Border Margin="0,5,0,0" Padding="9,6" CornerRadius="5"
+                            Background="{StaticResource Surface}"
+                            Visibility="{Binding HasResult, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="{Binding Result}" Style="{StaticResource Mono}"
+                                   TextWrapping="Wrap" Opacity="0.85" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsYou}" Value="True">
+                    <Setter TargetName="Role" Property="Foreground" Value="{StaticResource Accent}" />
+                    <Setter TargetName="Body" Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsTool}" Value="True">
+                    <Setter TargetName="Role" Property="Foreground" Value="{StaticResource Green}" />
+                    <Setter TargetName="Body" Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+                    <Setter TargetName="Body" Property="FontSize" Value="12" />
+                    <Setter TargetName="Body" Property="Foreground" Value="{StaticResource Muted}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsThinking}" Value="True">
+                    <Setter TargetName="Body" Property="FontStyle" Value="Italic" />
+                    <Setter TargetName="Body" Property="Foreground" Value="{StaticResource Muted}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="0,0,0,1"
+                Padding="18,12">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="{Binding Title}" Style="{StaticResource H1}"
+                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
+                        <TextBlock Text="{Binding SubtitleText}" Style="{StaticResource Mono}"
+                                   Margin="0,3,0,0" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding SubtitleText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Explorer" Style="{StaticResource LinkButton}"
+                                Command="{Binding ExplorerCommand}" />
+                        <Button Content="Copy id" Style="{StaticResource LinkButton}"
+                                Command="{Binding CopyIdCommand}" />
+                        <Button Content="Resume" Style="{StaticResource PrimaryButton}"
+                                Margin="8,0,0,0" Command="{Binding ResumeCommand}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" MaxWidth="420" HorizontalAlignment="Left">
+                        <TextBox x:Name="FindBox"
+                                 Style="{StaticResource PlaceholderTextBox}"
+                                 Tag="Find in this conversation..."
+                                 Text="{Binding FindText, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="9,6,28,6" MinWidth="300" />
+                        <Button Content="✕" Style="{StaticResource LinkButton}"
+                                HorizontalAlignment="Right" Margin="0,0,5,0"
+                                Command="{Binding ClearFindCommand}"
+                                Visibility="{Binding FindText, Converter={StaticResource TextToVis}}" />
+                    </Grid>
+                    <CheckBox Grid.Column="1" Content="only matching turns"
+                              Foreground="{StaticResource Muted}" FontSize="12"
+                              VerticalAlignment="Center" Margin="14,0,0,0"
+                              IsChecked="{Binding OnlyMatches}" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="18,14,10,14">
+            <ItemsControl ItemsSource="{Binding Turns}" />
+        </ScrollViewer>
+
+        <Border Grid.Row="2" Background="{StaticResource Surface}"
+                BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="0,1,0,0"
+                Padding="18,8">
+            <Grid>
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource Label}" />
+                <TextBlock Text="{Binding Message}" HorizontalAlignment="Right" FontSize="11"
+                           Foreground="{Binding MessageIsError, Converter={StaticResource MessageBrush}}"
+                           Visibility="{Binding HasMessage, Converter={StaticResource BoolToVis}}" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

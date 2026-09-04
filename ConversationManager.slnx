@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ConversationManager/ConversationManager.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ConversationManager.Tests/ConversationManager.Tests.csproj" />
+    <Project Path="tests/ConversationManager.UiTests/ConversationManager.UiTests.csproj" />
+  </Folder>
+</Solution>

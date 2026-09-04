@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ConversationManager.Tests</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!--
+    A plain console runner, not a test framework: the whole tool is meant to build and run with
+    nothing installed beyond the SDK, and the tests hold to the same rule.
+
+    The app's model and service files are compiled in directly because the app itself targets
+    net10.0-windows (WPF) and cannot be referenced from a plain console project. Those two folders
+    are deliberately free of WPF types so this stays possible.
+  -->
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="TestData.cs" />
+    <Compile Include="..\..\src\ConversationManager\Models\*.cs" />
+    <Compile Include="..\..\src\ConversationManager\Services\*.cs" />
+  </ItemGroup>
+
+</Project>

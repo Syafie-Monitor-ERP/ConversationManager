@@ -1,0 +1,345 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ConversationManager">
+
+    <!-- Palette -->
+    <Color x:Key="BgColor">#FF1B1D21</Color>
+    <Color x:Key="SurfaceColor">#FF24272C</Color>
+    <Color x:Key="Surface2Color">#FF2E3238</Color>
+    <Color x:Key="BorderColor">#FF3A3F47</Color>
+    <Color x:Key="TextColor">#FFE7E9EC</Color>
+    <Color x:Key="MutedColor">#FF9AA0A8</Color>
+    <Color x:Key="AccentColor">#FF5B9CFF</Color>
+    <Color x:Key="GreenColor">#FF56C271</Color>
+    <Color x:Key="AmberColor">#FFE0B341</Color>
+    <Color x:Key="RedColor">#FFE5675B</Color>
+
+    <SolidColorBrush x:Key="Bg" Color="{StaticResource BgColor}" />
+    <SolidColorBrush x:Key="Surface" Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="Surface2" Color="{StaticResource Surface2Color}" />
+    <SolidColorBrush x:Key="BorderBrushSoft" Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="Text" Color="{StaticResource TextColor}" />
+    <SolidColorBrush x:Key="Muted" Color="{StaticResource MutedColor}" />
+    <SolidColorBrush x:Key="Accent" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="Green" Color="{StaticResource GreenColor}" />
+    <SolidColorBrush x:Key="Amber" Color="{StaticResource AmberColor}" />
+    <SolidColorBrush x:Key="Red" Color="{StaticResource RedColor}" />
+
+    <!-- Matched words inside a snippet. Warm, so it reads as "here it is" against blue accents. -->
+    <Color x:Key="HitColor">#FFFFD479</Color>
+    <SolidColorBrush x:Key="Hit" Color="{StaticResource HitColor}" />
+
+    <!-- Converters -->
+    <local:BoolToVisibilityConverter x:Key="BoolToVis" />
+    <local:BoolToVisibilityConverter x:Key="BoolToVisInv" Invert="True" />
+    <local:NullOrEmptyToVisibilityConverter x:Key="TextToVis" />
+    <local:NullOrEmptyToVisibilityConverter x:Key="TextToVisInv" Invert="True" />
+    <local:HintMarginConverter x:Key="HintMargin" />
+    <!-- A hit in command output is weaker evidence than one in a prompt, and is coloured to say so. -->
+    <local:BoolToResourceConverter x:Key="DeepBrush"
+                                   TrueValue="{StaticResource Muted}"
+                                   FalseValue="{StaticResource Accent}" />
+    <local:BoolToResourceConverter x:Key="MessageBrush"
+                                   TrueValue="{StaticResource Red}"
+                                   FalseValue="{StaticResource Green}" />
+
+    <!-- Text styles -->
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Text}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Key="H1" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Text}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="Label" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Key="Mono" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+        <Setter Property="FontSize" Value="11" />
+    </Style>
+
+    <!-- Buttons -->
+    <Style x:Key="ButtonBase" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource Text}" />
+        <Setter Property="Background" Value="{StaticResource Surface2}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF3A4048" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF454C56" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.45" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource ButtonBase}">
+        <Setter Property="Background" Value="{StaticResource Accent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Accent}" />
+        <Setter Property="Foreground" Value="#FF0F1116" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF75AEFF" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="LinkButton" TargetType="Button" BasedOn="{StaticResource ButtonBase}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Padding" Value="6,3" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF343A42" />
+                            <Setter Property="Foreground" Value="{StaticResource Text}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        The delete links. Muted at rest, like every other link on a card - a row of red buttons
+        would shout about the one action nobody performs most of the time. The colour arrives on
+        hover, before the click that opens the confirmation, so the pointer lands on something
+        that has already said what it is.
+    -->
+    <Style x:Key="DangerLinkButton" TargetType="Button" BasedOn="{StaticResource LinkButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF4A2B28" />
+                            <Setter Property="Foreground" Value="{StaticResource Red}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF5E332E" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Inputs -->
+    <Style TargetType="TextBox">
+        <Setter Property="Foreground" Value="{StaticResource Text}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Text}" />
+        <Setter Property="Background" Value="{StaticResource Surface2}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                        <!-- No Margin here: TextBoxBase applies Padding to PART_ContentHost
+                             itself, and setting both indents the text twice. -->
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        Text box with a placeholder. The hint lives INSIDE the template and is positioned from
+        the same Padding the text is, so the two cannot drift apart the way a hand-placed
+        overlay does. Two WPF details make this work, both pinned by tests:
+
+          * PART_ContentHost must NOT be given Margin="{TemplateBinding Padding}" - TextBoxBase
+            already applies Padding to it, and setting both indents the text twice.
+          * TextBoxView then draws text a further fixed 2px in, which HintMargin adds back.
+
+        Font properties are template-bound because the global TextBlock style would otherwise
+        override the inherited ones and shift the glyphs. Put the hint text in Tag.
+    -->
+    <Style x:Key="PlaceholderTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                        <Grid>
+                            <TextBlock x:Name="Placeholder"
+                                       Text="{TemplateBinding Tag}"
+                                       Margin="{TemplateBinding Padding,
+                                                Converter={StaticResource HintMargin}}"
+                                       Foreground="{StaticResource Muted}"
+                                       FontFamily="{TemplateBinding FontFamily}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       FontStyle="{TemplateBinding FontStyle}"
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       FontStretch="{TemplateBinding FontStretch}"
+                                       TextTrimming="CharacterEllipsis"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed" />
+                            <!-- No Margin: Padding is applied to PART_ContentHost by
+                                 TextBoxBase, so the hint's Margin must match Padding alone. -->
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        A two or three way switch, drawn as one connected strip. Each button binds its own
+        "am I the active one" flag into Tag, which the trigger below reads - a plain Button style
+        cannot see the view model, but it can see itself.
+
+        This replaced a pair of ComboBoxes: WPF's default combo chrome is light and ignores a
+        Background setter, so the selected text was drawn near-white on near-white.
+    -->
+    <Style x:Key="SegmentButton" TargetType="Button" BasedOn="{StaticResource ButtonBase}">
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            CornerRadius="4" SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF343A42" />
+                            <Setter Property="Foreground" Value="{StaticResource Text}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}"
+                                     Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF3A557F" />
+                            <Setter Property="Foreground" Value="{StaticResource Text}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SegmentStrip" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface2}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!-- Cards -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Surface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Padding" Value="7,2" />
+        <Setter Property="Background" Value="{StaticResource Surface2}" />
+    </Style>
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="10" />
+    </Style>
+
+</ResourceDictionary>
